@@ -28,9 +28,9 @@
 ### Infrastructure
 - **Deployment**: Docker Compose (local development & target deployment).
 - **Services**: PostgreSQL, MinIO.
+- **Development Tools**: Makefile for workflow orchestration.
 - **Monorepo Structure**:
   - `server/`: FastAPI application.
-  scale: 1
   - `client/`: Next.js application.
 
 ## Engineering Standards
