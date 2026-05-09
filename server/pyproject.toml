@@ -1,0 +1,30 @@
+[project]
+name = "doc_manager_server"
+version = "0.1.0"
+description = "FastAPI backend for document management"
+authors = [
+    {name = "Developer",email = "dev@example.com"}
+]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "sqlmodel",
+    "pyd	mantic",
+    "boto3",
+    "python-multipart",
+    "python-dotenv",
+]
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

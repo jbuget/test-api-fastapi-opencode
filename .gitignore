@@ -1,0 +1,28 @@
+import os
+
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore environments
+.venv/
+venv/
+env/
+ENV/
+
+# Ignore IDEs
+.vscode/
+.idea/
+
+# Ignore Docker/Local DB
+postgres_data/
+minio_data/
+.env
+
+# Ignore Node/Frontend
+node_modules/
+client/out/
+client/.next/
+client/dist/
+client/build/
