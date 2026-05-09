@@ -1,14 +1,14 @@
 import pytest
 from unittest.mock import AsyncMock
-from src.application.auth.use_cases import RegisterUseCase
+from src.application.auth.use_cases import RegisterUseCase, LoginUseCase
 from src.domain.user_repository import UserRepository
 from src.domain.user import User
+import hashlib
 
 @pytest.mark.asyncio
 async def test_register_user_success():
     # Arrange
     mock_repo = AsyncMock(spec=UserRepository)
-    mock_import_repo = AsyncMock(spec=UserRepository)
     mock_repo.get_by_email.return_value = None
     
     use_case = RegisterUseCase(user_repository=mock_repo)
@@ -50,3 +50,58 @@ async def test_register_user_email_already_exists_fails():
     # Act & Assert
     with pytest.raises(ValueError, match="Email already in use"):
         await use_case.execute(user_data)
+
+@pytest.mark.asyncio
+async def test_login_user_success():
+    # Arrange
+    mock_repo = AsyncMock(spec=UserRepository)
+    # We need to use the same hashing as the implementation (SHA256)
+    password = "securepassword_123"
+    password_hash = hashlib.sha256(password.encode()).hexdigest()
+    
+    existing_user = User(
+        id="some-id",
+        email="test@example.com",
+        password_hash=password_hash,
+        display_name="Test User"
+    )
+    mock_repo.get_by_email.return_value = existing_user
+    
+    use_case = LoginUseCase(user_repository=mock_repo)
+    
+    login_data = {
+        "email": "test@example.com",
+        "password": "securepassword_123"
+    }
+
+    # Act
+    user = await use_case.execute(login_data)
+
+    # Assert
+    assert user.email == "test@example.com"
+    assert user.id == "some-id"
+
+@pytest.mark.asyncio
+async def test_login_user_invalid_password_fails():
+    # Arrange
+    mock_repo = AsyncMock(spec=UserRepository)
+    password_hash = hashlib.sha256("correct_password".encode()).hexdigest()
+    
+    existing_user = User(
+        id="some-id",
+        email="test@example.com",
+        password_hash=password_hash,
+        display_name="Test User"
+    )
+    mock_repo.get_by_email.return_value = existing_user
+    
+    use_case = LoginUseCase(user_repository=mock_repo)
+    
+    login_data = {
+        "email": "test@example.com",
+        "password": "wrong_password"
+    }
+
+    # Act & Assert
+    with pytest.raises(ValueError, match="Invalid credentials"):
+        await use_case.execute(login_data)

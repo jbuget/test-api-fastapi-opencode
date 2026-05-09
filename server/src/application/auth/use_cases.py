@@ -1,5 +1,5 @@
-import uuid
 import hashlib
+import uuid
 from typing import Any, Dict
 from src.domain.user import User
 from src.domain.user_repository import UserRepository
@@ -33,3 +33,22 @@ class RegisterUseCase:
         await self.user_repository.save(new_user)
 
         return new_user
+
+class LoginUseCase:
+    def __init__(self, user_repository: UserRepository):
+        self.user_repository = user_repository
+
+    async def execute(self, login_data: Dict[str, Any]) -> User:
+        email = login_data["email"]
+        password = login_data["password"]
+
+        user = await self.user_repository.get_by_email(email)
+        if not user:
+            raise ValueError("Invalid credentials")
+
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        if user.password_hash != password_hash:
+            raise ValueError("Invalid credentials")
+
+        return user
+
